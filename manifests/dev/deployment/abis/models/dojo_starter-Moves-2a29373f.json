@@ -368,32 +368,6 @@
   },
   {
     "type": "enum",
-    "name": "dojo_starter::models::Direction",
-    "variants": [
-      {
-        "name": "None",
-        "type": "()"
-      },
-      {
-        "name": "Left",
-        "type": "()"
-      },
-      {
-        "name": "Right",
-        "type": "()"
-      },
-      {
-        "name": "Up",
-        "type": "()"
-      },
-      {
-        "name": "Down",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "type": "enum",
     "name": "core::bool",
     "variants": [
       {
@@ -417,10 +391,6 @@
       {
         "name": "remaining",
         "type": "core::integer::u8"
-      },
-      {
-        "name": "last_direction",
-        "type": "dojo_starter::models::Direction"
       },
       {
         "name": "can_move",
