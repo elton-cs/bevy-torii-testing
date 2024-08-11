@@ -1,13 +1,13 @@
 use async_channel::{unbounded, Receiver};
 #[cfg(target_arch = "wasm32")]
 use bevy::tasks::IoTaskPool;
-use bevy::{prelude::*, tasks::futures_lite::StreamExt, utils::info};
+use bevy::{prelude::*, tasks::futures_lite::StreamExt};
 use cainome::cairo_serde::ContractAddress;
 use starknet_crypto::Felt;
 use torii_client::client::Client;
 use torii_grpc::{
     client::EntityUpdateStreaming,
-    types::{schema::Entity, EntityKeysClause, KeysClause},
+    types::{schema::Entity as DojoEntity, EntityKeysClause, KeysClause},
 };
 
 use crate::bindgen::bevy::components::moves::Moves;
@@ -16,13 +16,13 @@ pub struct ToriiPlugin;
 impl Plugin for ToriiPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_torii_client);
-        app.add_systems(Update, parse_dojo_entity);
+        app.add_systems(Update, (parse_dojo_entity, spawn_or_update).chain());
     }
 }
 
 #[derive(Resource)]
 pub struct ToriiClient {
-    pub entity_rx: Receiver<Entity>,
+    pub entity_rx: Receiver<DojoEntity>,
     #[cfg(not(target_arch = "wasm32"))]
     pub runtime: tokio::runtime::Runtime,
 }
@@ -34,7 +34,7 @@ fn setup_torii_client(mut commands: Commands) {
     let world = Felt::from_hex_unchecked(
         "0x5d97c46d046f442f125b6cc83057e97ee6e848c4921126acd8ae9d17b55b369",
     );
-    let (tx, rx) = unbounded();
+    let (tx, rx) = unbounded::<DojoEntity>();
 
     #[cfg(target_arch = "wasm32")]
     let pool = IoTaskPool::get();
@@ -96,7 +96,12 @@ fn setup_torii_client(mut commands: Commands) {
     });
 }
 
-fn parse_dojo_entity(mut commands: Commands, torii_client: Res<ToriiClient>) {
+#[derive(Debug, Component)]
+struct TempDojoEntity {
+    moves: Moves,
+}
+
+fn parse_dojo_entity(torii_client: Res<ToriiClient>, mut commands: Commands) {
     match torii_client.entity_rx.try_recv() {
         Ok(dojo_entity) => {
             info!("Received Dojo entity: {:?}", dojo_entity);
@@ -107,7 +112,8 @@ fn parse_dojo_entity(mut commands: Commands, torii_client: Res<ToriiClient>) {
                         "Spawned Bevy equivalent entity from Dojo entity: {:?}",
                         moves
                     );
-                    commands.spawn(moves);
+                    let dojo_entity = TempDojoEntity { moves };
+                    commands.spawn(dojo_entity);
                 }
             }
         }
@@ -120,7 +126,7 @@ fn parse_dojo_entity(mut commands: Commands, torii_client: Res<ToriiClient>) {
 }
 
 // this function assumes that the dojo entity is a Moves entity
-fn dojo_to_bevy(dojo_entity: &Entity) -> Option<Moves> {
+fn dojo_to_bevy(dojo_entity: &DojoEntity) -> Option<Moves> {
     let model = &dojo_entity.models[0];
     let name = model.name.split('-').last().unwrap();
     info!("Model name: {:?}", model.name);
@@ -156,5 +162,35 @@ fn dojo_to_bevy(dojo_entity: &Entity) -> Option<Moves> {
             })
         }
         _ => None,
+    }
+}
+
+fn spawn_or_update(
+    mut commands: Commands,
+    mut query_dojo_entity: Query<(Entity, &mut TempDojoEntity)>,
+    mut query_bevy_entity: Query<&mut Moves>,
+) {
+    for (id, dojo_entity) in query_dojo_entity.iter_mut() {
+        let player = dojo_entity.moves.player.clone();
+        let new_remaining = dojo_entity.moves.remaining.clone();
+        let new_can_move = dojo_entity.moves.can_move.clone();
+
+        let mut is_new = true;
+
+        for mut existing_moves in query_bevy_entity.iter_mut() {
+            if existing_moves.player == player {
+                existing_moves.remaining = new_remaining;
+                is_new = false;
+            }
+        }
+        if is_new {
+            commands.spawn(Moves {
+                player,
+                remaining: new_remaining,
+                can_move: new_can_move,
+            });
+        }
+
+        commands.entity(id).despawn();
     }
 }
