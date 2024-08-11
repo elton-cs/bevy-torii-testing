@@ -24,16 +24,12 @@ manifest_name = "dojo-base"
 [[contracts]]
 kind = "DojoContract"
 address = "0x47eb95a77c9defc187f00d67cd4cd400a028fa5ff0042470e14df8c890157d9"
-class_hash = "0x5c34a51148d5e94bb4c260de64ef2784e5ded3cf4f47b9e6e443d1c1cba4584"
-original_class_hash = "0x5c34a51148d5e94bb4c260de64ef2784e5ded3cf4f47b9e6e443d1c1cba4584"
+class_hash = "0x17351921aadce87544a48c8efe20a74b8c7881b755a254abfc5d3cbf906ac45"
+original_class_hash = "0x17351921aadce87544a48c8efe20a74b8c7881b755a254abfc5d3cbf906ac45"
 base_class_hash = "0x2427dd10a58850ac9a5ca6ce04b7771b05330fd18f2e481831ad903b969e6b2"
 abi = "manifests/dev/deployment/abis/contracts/dojo_starter-actions-7a1c7102.json"
 reads = []
-writes = [
-    "dojo_starter-Moves",
-    "dojo_starter-Position",
-    "dojo_starter-DirectionsAvailable",
-]
+writes = ["dojo_starter-Moves"]
 computed = []
 init_calldata = []
 tag = "dojo_starter-actions"

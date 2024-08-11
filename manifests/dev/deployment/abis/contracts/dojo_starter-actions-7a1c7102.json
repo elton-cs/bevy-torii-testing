@@ -134,7 +134,15 @@
   {
     "type": "interface",
     "name": "dojo_starter::systems::actions::IActions",
-    "items": []
+    "items": [
+      {
+        "type": "function",
+        "name": "spawn_move",
+        "inputs": [],
+        "outputs": [],
+        "state_mutability": "external"
+      }
+    ]
   },
   {
     "type": "impl",
