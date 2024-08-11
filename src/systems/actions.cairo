@@ -5,6 +5,8 @@
 #[dojo::interface]
 trait IActions {
     fn spawn_move(ref world: IWorldDispatcher);
+    fn incr(ref world: IWorldDispatcher);
+    fn decr(ref world: IWorldDispatcher);
     // fn move(ref world: IWorldDispatcher, direction: Direction);
 }
 
@@ -23,6 +25,26 @@ mod actions {
             let caller = get_caller_address();
             let moves = Moves { player: caller, remaining: 100, can_move: false };
             set!(world, (moves));
+        }
+
+        fn incr(ref world: IWorldDispatcher) {
+            let caller = get_caller_address();
+
+            let moves = get!(world, caller, Moves);
+            let new_moves = Moves {
+                player: moves.player, remaining: moves.remaining + 5, can_move: moves.can_move
+            };
+            set!(world, (new_moves));
+        }
+
+        fn decr(ref world: IWorldDispatcher) {
+            let caller = get_caller_address();
+
+            let moves = get!(world, caller, Moves);
+            let new_moves = Moves {
+                player: moves.player, remaining: moves.remaining - 5, can_move: moves.can_move
+            };
+            set!(world, (new_moves));
         }
     }
 }
