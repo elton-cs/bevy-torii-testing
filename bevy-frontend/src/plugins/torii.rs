@@ -17,7 +17,7 @@ pub struct ToriiPlugin;
 impl Plugin for ToriiPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_torii_client);
-        app.add_systems(Update, parse_dojo_entity);
+        app.add_systems(Update, (parse_dojo_entity, spawn_or_update).chain());
     }
 }
 
@@ -113,7 +113,7 @@ fn parse_dojo_entity(torii_client: Res<ToriiClient>, mut commands: Commands) {
                     "Spawned Bevy equivalent entity from Dojo entity: {:?}",
                     moves
                 );
-                commands.spawn(moves);
+                commands.spawn(TempDojoEntity { moves });
             }
         }
         Err(err) => {
@@ -124,32 +124,32 @@ fn parse_dojo_entity(torii_client: Res<ToriiClient>, mut commands: Commands) {
     }
 }
 
-// fn spawn_or_update(
-//     mut commands: Commands,
-//     mut query_dojo_entity: Query<(Entity, &mut TempDojoEntity)>,
-//     mut query_bevy_entity: Query<&mut Moves>,
-// ) {
-//     for (id, dojo_entity) in query_dojo_entity.iter_mut() {
-//         let player = dojo_entity.moves.player.clone();
-//         let new_remaining = dojo_entity.moves.remaining.clone();
-//         let new_can_move = dojo_entity.moves.can_move.clone();
+fn spawn_or_update(
+    mut commands: Commands,
+    mut query_dojo_entity: Query<(Entity, &mut TempDojoEntity)>,
+    mut query_bevy_entity: Query<&mut Moves>,
+) {
+    for (id, dojo_entity) in query_dojo_entity.iter_mut() {
+        let player = dojo_entity.moves.player.clone();
+        let new_remaining = dojo_entity.moves.remaining.clone();
+        let new_can_move = dojo_entity.moves.can_move.clone();
 
-//         let mut is_new = true;
+        let mut is_new = true;
 
-//         for mut existing_moves in query_bevy_entity.iter_mut() {
-//             if existing_moves.player == player {
-//                 existing_moves.remaining = new_remaining;
-//                 is_new = false;
-//             }
-//         }
-//         if is_new {
-//             commands.spawn(Moves {
-//                 player,
-//                 remaining: new_remaining,
-//                 can_move: new_can_move,
-//             });
-//         }
+        for mut existing_moves in query_bevy_entity.iter_mut() {
+            if existing_moves.player == player {
+                existing_moves.remaining = new_remaining;
+                is_new = false;
+            }
+        }
+        if is_new {
+            commands.spawn(Moves {
+                player,
+                remaining: new_remaining,
+                can_move: new_can_move,
+            });
+        }
 
-//         commands.entity(id).despawn();
-//     }
-// }
+        commands.entity(id).despawn();
+    }
+}
