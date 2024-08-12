@@ -12,6 +12,7 @@ starknet-types-core = "~0.1.4"
 tokio = "1.39.2"
 torii-client = { git = "https://github.com/dojoengine/dojo.git", rev = "f1c521451eab22d240ae378f8b2a9c6ae981375f" }
 torii-grpc = { git = "https://github.com/dojoengine/dojo.git", rev = "f1c521451eab22d240ae378f8b2a9c6ae981375f" }
+dojo-types = { git = "https://github.com/dojoengine/dojo.git", rev = "f1c521451eab22d240ae378f8b2a9c6ae981375f" }
 cainome = { git = "https://github.com/cartridge-gg/cainome", rev = "7b0c2b369063fc1a34152ec999028a7e9dd093a3" }
 
 [patch.crates-io]

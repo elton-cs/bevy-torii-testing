@@ -804,6 +804,7 @@ dependencies = [
  "async-channel 2.3.1",
  "bevy",
  "cainome 0.2.3 (git+https://github.com/cartridge-gg/cainome?rev=7b0c2b369063fc1a34152ec999028a7e9dd093a3)",
+ "dojo-types",
  "starknet",
  "starknet-crypto 0.7.1",
  "starknet-types-core",

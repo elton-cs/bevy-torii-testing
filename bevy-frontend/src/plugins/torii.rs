@@ -11,6 +11,7 @@ use torii_grpc::{
 };
 
 use crate::bindgen::bevy::components::moves::Moves;
+use crate::manual_bindgen::ToriiToBevy;
 
 pub struct ToriiPlugin;
 impl Plugin for ToriiPlugin {
@@ -107,7 +108,10 @@ fn parse_dojo_entity(torii_client: Res<ToriiClient>, mut commands: Commands) {
             info!("Received Dojo entity: {:?}", dojo_entity);
             let length = dojo_entity.models.len();
             if length == 1 {
-                if let Some(moves) = dojo_to_bevy(&dojo_entity) {
+                // if let Some(moves) = dojo_to_bevy(&dojo_entity) {
+                if let Some(moves) =
+                    Some(Moves::dojo_model_to_bevy_component(&dojo_entity.models[0]))
+                {
                     info!(
                         "Spawned Bevy equivalent entity from Dojo entity: {:?}",
                         moves
