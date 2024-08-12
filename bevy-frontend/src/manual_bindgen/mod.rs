@@ -1,16 +1,8 @@
+use crate::bindgen::bevy::components::moves::Moves;
 use bevy::prelude::*;
 use cainome::cairo_serde::ContractAddress;
 use dojo_types::schema::Struct as DojoStruct;
 use torii_grpc::types::schema::Entity as DojoEntity;
-
-use crate::bindgen::bevy::components::moves::Moves;
-
-// #[derive(Component, Debug, Clone, Copy)]
-// pub struct Moves {
-//     pub player: cainome::cairo_serde::ContractAddress,
-//     pub remaining: u8,
-//     pub can_move: bool,
-// }
 
 pub trait ToriiToBevy<T> {
     fn dojo_model_to_bevy_component(model: &DojoStruct) -> T;
